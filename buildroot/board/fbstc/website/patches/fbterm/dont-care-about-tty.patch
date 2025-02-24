@@ -1,0 +1,31 @@
+diff --git a/src/input.cpp b/src/input.cpp
+index f6ab87b..51d5a2c 100644
+--- a/src/input.cpp
++++ b/src/input.cpp
+@@ -43,16 +43,16 @@ DEFINE_INSTANCE(TtyInput)
+ 
+ TtyInput *TtyInput::createInstance()
+ {
+-	s8 buf[64];
+-	if (ttyname_r(STDIN_FILENO, buf, sizeof(buf))) {
+-		fprintf(stderr, "stdin isn't a tty!\n");
+-		return 0;
+-	}
+-
+-	if (!strstr(buf, "/dev/tty") && !strstr(buf, "/dev/vc")) {
+-		fprintf(stderr, "stdin isn't a interactive tty!\n");
+-		return 0;
+-	}
++	//s8 buf[64];
++	//if (ttyname_r(STDIN_FILENO, buf, sizeof(buf))) {
++	//	fprintf(stderr, "stdin isn't a tty!\n");
++	//	return 0;
++	//}
++
++	//if (!strstr(buf, "/dev/tty") && !strstr(buf, "/dev/vc")) {
++	//	fprintf(stderr, "stdin isn't a interactive tty!\n");
++	//	return 0;
++	//}
+ 
+ 	return new TtyInput();
+ }

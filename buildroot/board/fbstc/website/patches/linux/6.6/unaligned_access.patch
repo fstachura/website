@@ -1,0 +1,27 @@
+diff --git a/arch/riscv/kernel/cpufeature.c b/arch/riscv/kernel/cpufeature.c
+index 1cfbba65d11a..0cea24e329b8 100644
+--- a/arch/riscv/kernel/cpufeature.c
++++ b/arch/riscv/kernel/cpufeature.c
+@@ -651,7 +651,7 @@ static int check_unaligned_access_boot_cpu(void)
+ 	return 0;
+ }
+ 
+-arch_initcall(check_unaligned_access_boot_cpu);
++//arch_initcall(check_unaligned_access_boot_cpu);
+ 
+ #ifdef CONFIG_RISCV_ALTERNATIVE
+ /*
+diff --git a/arch/riscv/kernel/smpboot.c b/arch/riscv/kernel/smpboot.c
+index 1b8da4e40a4d..5696973649da 100644
+--- a/arch/riscv/kernel/smpboot.c
++++ b/arch/riscv/kernel/smpboot.c
+@@ -246,7 +246,8 @@ asmlinkage __visible void smp_callin(void)
+ 
+ 	numa_add_cpu(curr_cpuid);
+ 	set_cpu_online(curr_cpuid, 1);
+-	check_unaligned_access(curr_cpuid);
++//	check_unaligned_access(curr_cpuid);
++	probe_vendor_features(curr_cpuid);
+ 
+ 	if (has_vector()) {
+ 		if (riscv_v_setup_vsize())

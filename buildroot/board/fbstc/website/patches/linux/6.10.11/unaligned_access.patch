@@ -1,0 +1,10 @@
+diff --git a/arch/riscv/kernel/unaligned_access_speed.c b/arch/riscv/kernel/unaligned_access_speed.c
+index a9a6bcb02acf..72974dbf19e9 100644
+--- a/arch/riscv/kernel/unaligned_access_speed.c
++++ b/arch/riscv/kernel/unaligned_access_speed.c
+@@ -278,4 +278,4 @@ static int check_unaligned_access_all_cpus(void)
+ }
+ #endif
+ 
+-arch_initcall(check_unaligned_access_all_cpus);
++//arch_initcall(check_unaligned_access_all_cpus);

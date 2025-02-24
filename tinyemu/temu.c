@@ -204,6 +204,25 @@ CharacterDevice *console_init(BOOL allow_ctrlc)
     return dev;
 }
 
+static void extra_serial_write(void *opaque, const uint8_t *buf, int len)
+{
+    fwrite(buf, 1, len, stderr);
+    fflush(stdout);
+}
+
+static int extra_serial_read(void *opaque, uint8_t *buf, int len) {
+    printf("extra serial read\n");
+    return 0;
+}
+
+CharacterDevice *extra_serial_init() {
+    CharacterDevice *dev;
+    dev = mallocz(sizeof(*dev));
+    dev->write_data = extra_serial_write;
+    dev->read_data = extra_serial_read;
+    return dev;
+}
+
 #endif /* !_WIN32 */
 
 typedef enum {
@@ -815,6 +834,7 @@ int main(int argc, char **argv)
         p->console = console_init(allow_ctrlc);
 #endif
     }
+    //p->extra_serial = extra_serial_init();
     p->rtc_real_time = TRUE;
 
     s = virt_machine_init(p);

@@ -238,6 +238,8 @@ struct RISCVCPUState {
     TLBEntry tlb_read[TLB_SIZE];
     TLBEntry tlb_write[TLB_SIZE];
     TLBEntry tlb_code[TLB_SIZE];
+
+    uint64_t rtc_start_time;
 };
 
 #define target_read_slow glue(glue(riscv, MAX_XLEN), _read_slow)

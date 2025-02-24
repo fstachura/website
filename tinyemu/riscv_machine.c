@@ -585,6 +585,7 @@ void fdt_end(FDTState *s)
 }
 
 static int riscv_build_fdt(RISCVMachine *m, uint8_t *dst,
+                           uint64_t bios_start, uint64_t bios_size,
                            uint64_t kernel_start, uint64_t kernel_size,
                            uint64_t initrd_start, uint64_t initrd_size,
                            const char *cmd_line)
@@ -631,7 +632,7 @@ static int riscv_build_fdt(RISCVMachine *m, uint8_t *dst,
     fdt_prop_str(s, "riscv,isa", isa_string);
     
     fdt_prop_str(s, "mmu-type", max_xlen <= 32 ? "riscv,sv32" : "riscv,sv48");
-    fdt_prop_u32(s, "clock-frequency", 2000000000);
+    fdt_prop_u32(s, "clock-frequency", 1000000000);
 
     fdt_begin_node(s, "interrupt-controller");
     fdt_prop_u32(s, "#interrupt-cells", 1);
@@ -645,11 +646,32 @@ static int riscv_build_fdt(RISCVMachine *m, uint8_t *dst,
     
     fdt_end_node(s); /* cpus */
 
-    fdt_begin_node_num(s, "memory", RAM_BASE_ADDR);
+    // NOTE: it seems that 3335068f made linux start overwriting firmware. that leads to a crash
+    // - kernel starts overwriting bios, then something traps into bios, and then system grinds to a halt.
+    // there is probably a better way to solve this - the commit says "we rely on the firmware to protect itself using PMP."
+    // i'm not sure if temu supports pmp, i don't see any evidence of that but i also don't know much about risc-v.
+    // hence, i used reserved-memory to mark a region with bios from being overwritten by the kernel.
+    fdt_begin_node(s, "reserved-memory");
+    fdt_prop_u32(s, "#address-cells", 2);
+    fdt_prop_u32(s, "#size-cells", 2);
+    fdt_prop(s, "ranges", NULL, 0);
+    fdt_begin_node_num(s, "firmware", bios_start);
+    fdt_prop(s, "no-map", NULL, 0);
+    tab[0] = (uint64_t)(bios_start) >> 32;
+    tab[1] = bios_start;
+    tab[2] = (uint64_t)(bios_size) >> 32;;
+    tab[3] = bios_size;
+    fdt_prop_tab_u32(s, "reg", tab, 4);
+
+    fdt_end_node(s); /* memory */
+
+    fdt_end_node(s); /* reserved-memory */
+
+    fdt_begin_node_num(s, "memory", RAM_BASE_ADDR+0x10000);
     fdt_prop_str(s, "device_type", "memory");
-    tab[0] = (uint64_t)RAM_BASE_ADDR >> 32;
+    fdt_prop(s, "no-map", NULL, 0);
     tab[1] = RAM_BASE_ADDR;
-    tab[2] = m->ram_size >> 32;
+    tab[2] = (m->ram_size) >> 32;
     tab[3] = m->ram_size;
     fdt_prop_tab_u32(s, "reg", tab, 4);
     
@@ -732,14 +754,15 @@ static int riscv_build_fdt(RISCVMachine *m, uint8_t *dst,
         fdt_prop_tab_u64(s, "linux,initrd-start", initrd_start);
         fdt_prop_tab_u64(s, "linux,initrd-end", initrd_start + initrd_size);
     }
-    
+
+    //fdt_prop_tab_u64_2(s, "linux,usable-memory-range", RAM_BASE_ADDR + 0x10000, m->ram_size - 0x10000);
 
     fdt_end_node(s); /* chosen */
-    
+
     fdt_end_node(s); /* / */
 
     size = fdt_output(s, dst);
-#if 0
+#if 1
     {
         FILE *f;
         f = fopen("/tmp/riscvemu.dtb", "wb");
@@ -767,6 +790,7 @@ static void copy_bios(RISCVMachine *s, const uint8_t *buf, int buf_len,
 
     ram_ptr = get_ram_ptr(s, RAM_BASE_ADDR, TRUE);
     memcpy(ram_ptr, buf, buf_len);
+    printf("bios mem %x %x\n", RAM_BASE_ADDR, RAM_BASE_ADDR+buf_len);
 
     kernel_base = 0;
     if (kernel_buf_len > 0) {
@@ -801,6 +825,7 @@ static void copy_bios(RISCVMachine *s, const uint8_t *buf, int buf_len,
     fdt_addr = 0x1000 + 8 * 8;
 
     riscv_build_fdt(s, ram_ptr + fdt_addr,
+                    RAM_BASE_ADDR, buf_len,
                     RAM_BASE_ADDR + kernel_base, kernel_buf_len,
                     RAM_BASE_ADDR + initrd_base, initrd_buf_len,
                     cmd_line);
@@ -832,6 +857,7 @@ static VirtMachine *riscv_machine_init(const VirtMachineParams *p)
     VIRTIODevice *blk_dev;
     int irq_num, i, max_xlen, ram_flags;
     VIRTIOBusDef vbus_s, *vbus = &vbus_s;
+    uint64_t rtc_start_time;
 
 
     if (!strcmp(p->machine_name, "riscv32")) {
@@ -844,6 +870,8 @@ static VirtMachine *riscv_machine_init(const VirtMachineParams *p)
         vm_error("unsupported machine: %s\n", p->machine_name);
         return NULL;
     }
+
+    rtc_start_time = rtc_get_real_time(s);
     
     s = mallocz(sizeof(*s));
     s->common.vmc = p->vmc;
@@ -854,7 +882,7 @@ static VirtMachine *riscv_machine_init(const VirtMachineParams *p)
     s->mem_map->opaque = s;
     s->mem_map->flush_tlb_write_range = riscv_flush_tlb_write_range;
 
-    s->cpu_state = riscv_cpu_init(s->mem_map, max_xlen);
+    s->cpu_state = riscv_cpu_init(s->mem_map, max_xlen, rtc_start_time);
     if (!s->cpu_state) {
         vm_error("unsupported max_xlen=%d\n", max_xlen);
         /* XXX: should free resources */
@@ -881,6 +909,8 @@ static VirtMachine *riscv_machine_init(const VirtMachineParams *p)
                         s, htif_read, htif_write, DEVIO_SIZE32);
     s->common.console = p->console;
 
+    s->common.extra_serial = p->extra_serial;
+
     memset(vbus, 0, sizeof(*vbus));
     vbus->mem_map = s->mem_map;
     vbus->addr = VIRTIO_BASE_ADDR;
@@ -894,7 +924,17 @@ static VirtMachine *riscv_machine_init(const VirtMachineParams *p)
         irq_num++;
         s->virtio_count++;
     }
-    
+
+    /* virtio extra serial */
+    if (p->extra_serial) {
+        printf("registering extra serial\n");
+        vbus->irq = &s->plic_irq[irq_num];
+        s->common.extra_serial_dev = virtio_serial_init(vbus, p->extra_serial);
+        vbus->addr += VIRTIO_SIZE;
+        irq_num++;
+        s->virtio_count++;
+    }
+
     /* virtio net device */
     for(i = 0; i < p->eth_count; i++) {
         vbus->irq = &s->plic_irq[irq_num];
@@ -924,7 +964,6 @@ static VirtMachine *riscv_machine_init(const VirtMachineParams *p)
         (void)fs_dev;
         //        virtio_set_debug(fs_dev, VIRTIO_DEBUG_9P);
         vbus->addr += VIRTIO_SIZE;
-        irq_num++;
         s->virtio_count++;
     }
 

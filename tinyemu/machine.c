@@ -483,7 +483,7 @@ static void config_load_file_cb(void *opaque, int err, void *data, size_t size)
 {
     VMConfigLoadState *s = opaque;
     
-    //    printf("err=%d data=%p size=%ld\n", err, data, size);
+    //printf("handle=%p err=%d data=%p size=%ld\n", opaque, err, data, size);
     if (err < 0) {
         vm_error("Error %d while loading file\n", -err);
         exit(1);
@@ -495,7 +495,7 @@ static void config_load_file_cb(void *opaque, int err, void *data, size_t size)
 static void config_load_file(VMConfigLoadState *s, const char *filename,
                              FSLoadFileCB *cb, void *opaque)
 {
-    //    printf("loading %s\n", filename);
+    printf("loading %s\n", filename);
 #ifdef CONFIG_FS_NET
     if (is_url(filename)) {
         s->file_load_cb = cb;
@@ -554,9 +554,10 @@ static void config_additional_file_load(VMConfigLoadState *s)
         free(s);
     } else {
         char *fname;
-        
+
         fname = get_file_path(p->cfg_filename,
                               p->files[s->file_index].filename);
+
         config_load_file(s, fname,
                          config_additional_file_load_cb, s);
         free(fname);

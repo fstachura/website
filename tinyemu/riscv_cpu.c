@@ -28,6 +28,8 @@
 #include <inttypes.h>
 #include <assert.h>
 #include <fcntl.h>
+#include <time.h>
+#include <sys/time.h>
 
 #include "cutils.h"
 #include "iomem.h"
@@ -43,10 +45,11 @@
 //#define DUMP_INVALID_MEM_ACCESS
 //#define DUMP_MMU_EXCEPTIONS
 //#define DUMP_INTERRUPTS
-//#define DUMP_INVALID_CSR
+#define DUMP_INVALID_CSR
 //#define DUMP_EXCEPTIONS
 //#define DUMP_CSR
 //#define CONFIG_LOGFILE
+
 
 #include "riscv_cpu_priv.h"
 
@@ -104,6 +107,14 @@ static void print_target_ulong(target_ulong a)
     fprint_target_ulong(stdout, a);
 }
 
+static void check_overwrite(target_ulong paddr) {
+    if(paddr >= 0x80000000 && paddr <= 0x80000000 + 74258) {
+        if(paddr != 0x8000af10 && paddr != 0x80006558 && paddr != 0x8000af48 && paddr != 0x80008c24) {
+            //printf("bios overwrite %lx\n", paddr);
+        }
+    }
+}
+
 static char *reg_name[32] = {
 "zero", "ra", "sp", "gp", "tp", "t0", "t1", "t2",
 "s0", "s1", "a0", "a1", "a2", "a3", "a4", "a5",
@@ -154,6 +165,7 @@ static __attribute__((unused)) void cpu_abort(RISCVCPUState *s)
 static __maybe_unused inline void phys_write_u ## size(RISCVCPUState *s, target_ulong addr,\
                                         uint_type val)                   \
 {\
+    check_overwrite(addr); \
     PhysMemoryRange *pr = get_phys_mem_range(s->mem_map, addr);\
     if (!pr || !pr->is_ram)\
         return;\
@@ -373,6 +385,7 @@ int target_read_slow(RISCVCPUState *s, mem_uint_t *pval,
             return -1;
         }
         pr = get_phys_mem_range(s->mem_map, paddr);
+        check_overwrite(paddr);
         if (!pr) {
 #ifdef DUMP_INVALID_MEM_ACCESS
             printf("target_read_slow: invalid physical address 0x");
@@ -443,6 +456,7 @@ int target_write_slow(RISCVCPUState *s, target_ulong addr,
     target_ulong paddr, offset;
     uint8_t *ptr;
     PhysMemoryRange *pr;
+    check_overwrite(addr);
     
     /* first handle unaligned accesses */
     size = 1 << size_log2;
@@ -698,17 +712,45 @@ static void set_mstatus(RISCVCPUState *s, target_ulong val)
     s->mstatus = (s->mstatus & ~mask) | (val & mask);
 }
 
+#define RTC_FREQ 10000000
+#define RTC_FREQ_DIV 16 /* arbitrary, relative to CPU freq to have a
+                           10 MHz frequency */
+
+static uint64_t rtc_get_real_time()
+{
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    return (uint64_t)ts.tv_sec * RTC_FREQ +
+        (ts.tv_nsec / (1000000000 / RTC_FREQ));
+}
+
+static uint64_t rtc_get_time(RISCVCPUState *s)
+{
+    uint64_t val;
+    val = rtc_get_real_time(s);
+    return val;
+}
+
+
 /* return -1 if invalid CSR. 0 if OK. 'will_write' indicate that the
    csr will be written after (used for CSR access check) */
 static int csr_read(RISCVCPUState *s, target_ulong *pval, uint32_t csr,
                      BOOL will_write)
 {
     target_ulong val;
+    struct timespec ts;
+    struct timeval tv;
 
-    if (((csr & 0xc00) == 0xc00) && will_write)
+    //printf("csr_read %x\n", csr);
+
+    if (((csr & 0xc00) == 0xc00) && will_write) {
+        printf("read only read csr %d\n", csr);
         return -1; /* read-only CSR */
-    if (s->priv < ((csr >> 8) & 3))
+    }
+    if (s->priv < ((csr >> 8) & 3)) {
+        printf("not enough priv to read csr %d\n", csr);
         return -1; /* not enough priviledge */
+    }
     
     switch(csr) {
 #if FLEN > 0
@@ -841,6 +883,32 @@ static int csr_read(RISCVCPUState *s, target_ulong *pval, uint32_t csr,
     case 0xf14:
         val = s->mhartid;
         break;
+    // rdtime (time low)
+    case 0xc01:
+        val = rtc_get_time(s);
+        break;
+        //goto invalid_csr;
+        //gettimeofday(&tv, NULL);
+        //val = (((target_ulong)tv.tv_sec)*1000000)+((target_ulong)tv.tv_usec);
+        //val |= 
+        //printf("rdtime %lu\n", val);
+        //break;
+        //clock_gettime(CLOCK_MONOTONIC, &ts);
+        //val = (ts.tv_sec << 32) | ts.tv_nsec;
+        //printf("rdtime %lu\n", val);
+        //break;
+    // timeh (time high)
+    case 0xc81:
+        //gettimeofday(&tv, NULL);
+        //val = ((tv.tv_sec * 10000) + (tv.tv_usec)) >> 32;
+        //printf("timeh %lu\n", val);
+        //break;
+        //clock_gettime(CLOCK_MONOTONIC, &ts);
+        //val = ts.tv_nsec;((ts.tv_sec * 10000000) + (ts.tv_nsec/10000)) >> 32;
+        //val = rtc_get_time(s) >> 32;
+        //val = rtc_get_real_time() >> 32;
+        //printf("timeh %lu\n", val);
+        //break;
     default:
     invalid_csr:
 #ifdef DUMP_INVALID_CSR
@@ -1286,7 +1354,7 @@ static BOOL glue(riscv_cpu_get_power_down, MAX_XLEN)(RISCVCPUState *s)
     return s->power_down_flag;
 }
 
-static RISCVCPUState *glue(riscv_cpu_init, MAX_XLEN)(PhysMemoryMap *mem_map)
+static RISCVCPUState *glue(riscv_cpu_init, MAX_XLEN)(PhysMemoryMap *mem_map, uint64_t rtc_start_time)
 {
     RISCVCPUState *s;
     
@@ -1295,6 +1363,7 @@ static RISCVCPUState *glue(riscv_cpu_init, MAX_XLEN)(PhysMemoryMap *mem_map)
 #else
     s = mallocz(sizeof(*s));
 #endif
+    s->rtc_start_time = rtc_start_time;
     s->common.class_ptr = &glue(riscv_cpu_class, MAX_XLEN);
     s->mem_map = mem_map;
     s->pc = 0x1000;
@@ -1346,7 +1415,7 @@ const RISCVCPUClass glue(riscv_cpu_class, MAX_XLEN) = {
 };
 
 #if CONFIG_RISCV_MAX_XLEN == MAX_XLEN
-RISCVCPUState *riscv_cpu_init(PhysMemoryMap *mem_map, int max_xlen)
+RISCVCPUState *riscv_cpu_init(PhysMemoryMap *mem_map, int max_xlen, uint64_t rtc_start_time)
 {
     const RISCVCPUClass *c;
     switch(max_xlen) {
@@ -1371,7 +1440,7 @@ RISCVCPUState *riscv_cpu_init(PhysMemoryMap *mem_map, int max_xlen)
     default:
         return NULL;
     }
-    return c->riscv_cpu_init(mem_map);
+    return c->riscv_cpu_init(mem_map, rtc_start_time);
 }
 #endif /* CONFIG_RISCV_MAX_XLEN == MAX_XLEN */
 

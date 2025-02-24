@@ -114,6 +114,7 @@ typedef struct {
 } CharacterDevice;
 
 VIRTIODevice *virtio_console_init(VIRTIOBusDef *bus, CharacterDevice *cs);
+VIRTIODevice *virtio_serial_init(VIRTIOBusDef *bus, CharacterDevice *cs);
 BOOL virtio_console_can_write_data(VIRTIODevice *s);
 int virtio_console_get_write_len(VIRTIODevice *s);
 int virtio_console_write_data(VIRTIODevice *s, const uint8_t *buf, int buf_len);

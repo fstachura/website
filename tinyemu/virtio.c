@@ -1359,6 +1359,20 @@ VIRTIODevice *virtio_console_init(VIRTIOBusDef *bus, CharacterDevice *cs)
     return (VIRTIODevice *)s;
 }
 
+VIRTIODevice *virtio_serial_init(VIRTIOBusDef *bus, CharacterDevice *cs)
+{
+    VIRTIOConsoleDevice *s;
+
+    s = mallocz(sizeof(*s));
+    virtio_init(&s->common, bus,
+                3, 4, virtio_console_recv_request);
+    s->common.device_features = 0;
+    s->common.queue[0].manual_recv = TRUE;
+    
+    s->cs = cs;
+    return (VIRTIODevice *)s;
+}
+
 /*********************************************************************/
 /* input device */
 

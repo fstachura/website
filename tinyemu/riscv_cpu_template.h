@@ -1233,12 +1233,16 @@ static void no_inline glue(riscv_cpu_interp_x, XLEN)(RISCVCPUState *s,
             switch(funct3) {
             case 1: /* csrrw */
                 s->insn_counter = GET_INSN_COUNTER();
-                if (csr_read(s, &val2, imm, TRUE))
+                if (csr_read(s, &val2, imm, TRUE)) {
+                    //printf("csr read failed cssrw ");
                     goto illegal_insn;
+                }
                 val2 = (intx_t)val2;
                 err = csr_write(s, imm, val);
-                if (err < 0)
+                if (err < 0) {
+                    //printf("csr write failed cssrw ");
                     goto illegal_insn;
+                }
                 if (rd != 0)
                     s->reg[rd] = val2;
                 if (err > 0) {
@@ -1252,8 +1256,10 @@ static void no_inline glue(riscv_cpu_interp_x, XLEN)(RISCVCPUState *s,
             case 2: /* csrrs */
             case 3: /* csrrc */
                 s->insn_counter = GET_INSN_COUNTER();
-                if (csr_read(s, &val2, imm, (rs1 != 0)))
+                if (csr_read(s, &val2, imm, (rs1 != 0))) {
+                    printf("csr read failed cssrs/cssrc %x\n", imm);
                     goto illegal_insn;
+                }
                 val2 = (intx_t)val2;
                 if (rs1 != 0) {
                     if (funct3 == 2)
@@ -1261,8 +1267,10 @@ static void no_inline glue(riscv_cpu_interp_x, XLEN)(RISCVCPUState *s,
                     else
                         val = val2 & ~val;
                     err = csr_write(s, imm, val);
-                    if (err < 0)
+                    if (err < 0) {
+                        //printf("csr write failed cssrs/cssrc ");
                         goto illegal_insn;
+                    }
                 } else {
                     err = 0;
                 }
@@ -1279,21 +1287,29 @@ static void no_inline glue(riscv_cpu_interp_x, XLEN)(RISCVCPUState *s,
             case 0:
                 switch(imm) {
                 case 0x000: /* ecall */
-                    if (insn & 0x000fff80)
+                    if (insn & 0x000fff80) {
+                        printf("ecall invalid insn ");
                         goto illegal_insn;
+                    }
                     s->pending_exception = CAUSE_USER_ECALL + s->priv;
                     goto exception;
                 case 0x001: /* ebreak */
-                    if (insn & 0x000fff80)
+                    if (insn & 0x000fff80) {
+                        printf("ebreak invalid insn ");
                         goto illegal_insn;
+                    }
                     s->pending_exception = CAUSE_BREAKPOINT;
                     goto exception;
                 case 0x102: /* sret */
                     {
-                        if (insn & 0x000fff80)
+                        if (insn & 0x000fff80) {
+                            printf("sret invalid insn ");
                             goto illegal_insn;
-                        if (s->priv < PRV_S)
+                        }
+                        if (s->priv < PRV_S) {
+                            printf("sret invalid priv ");
                             goto illegal_insn;
+                        }
                         s->pc = GET_PC();
                         handle_sret(s);
                         goto done_interp;
@@ -1301,20 +1317,28 @@ static void no_inline glue(riscv_cpu_interp_x, XLEN)(RISCVCPUState *s,
                     break;
                 case 0x302: /* mret */
                     {
-                        if (insn & 0x000fff80)
+                        if (insn & 0x000fff80) {
+                            printf("mret invalid insn ");
                             goto illegal_insn;
-                        if (s->priv < PRV_M)
+                        }
+                        if (s->priv < PRV_M) {
+                            printf("mret invalid priv ");
                             goto illegal_insn;
+                        }
                         s->pc = GET_PC();
                         handle_mret(s);
                         goto done_interp;
                     }
                     break;
                 case 0x105: /* wfi */
-                    if (insn & 0x00007f80)
+                    if (insn & 0x00007f80) {
+                        printf("wfi invalid insn ");
                         goto illegal_insn;
-                    if (s->priv == PRV_U)
+                    }
+                    if (s->priv == PRV_U) {
+                        printf("wfi invalid priv ");
                         goto illegal_insn;
+                    }
                     /* go to power down if no enabled interrupts are
                        pending */
                     if ((s->mip & s->mie) == 0) {
@@ -1326,10 +1350,14 @@ static void no_inline glue(riscv_cpu_interp_x, XLEN)(RISCVCPUState *s,
                 default:
                     if ((imm >> 5) == 0x09) {
                         /* sfence.vma */
-                        if (insn & 0x00007f80)
+                        if (insn & 0x00007f80) {
+                            printf("sfence invalid insn ");
                             goto illegal_insn;
-                        if (s->priv == PRV_U)
+                        }
+                        if (s->priv == PRV_U) {
+                            printf("sfence invalid priv ");
                             goto illegal_insn;
+                        }
                         if (rs1 == 0) {
                             tlb_flush_all(s);
                         } else {
@@ -1345,6 +1373,7 @@ static void no_inline glue(riscv_cpu_interp_x, XLEN)(RISCVCPUState *s,
                 }
                 break;
             default:
+                printf("system invalid insn ");
                 goto illegal_insn;
             }
             NEXT_INSN;
@@ -1712,6 +1741,8 @@ static void no_inline glue(riscv_cpu_interp_x, XLEN)(RISCVCPUState *s,
     jump_insn: ;
     } /* end of main loop */
  illegal_insn:
+    //if(opcode != 0)
+    //    printf("illegal_insn opcode=%08x funct3=%08x imm=%08x\n", opcode, funct3, imm);
     s->pending_exception = CAUSE_ILLEGAL_INSTRUCTION;
     s->pending_tval = insn;
  mmu_exception:

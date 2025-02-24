@@ -21,7 +21,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
+/**
+ * @license
+ * Copyright 2011 The Emscripten Authors
+ * SPDX-License-Identifier: MIT
+ */
+
 mergeInto(LibraryManager.library, {
+    console_write__sig: 'vppi',
     console_write: function(opaque, buf, len)
     {
         var str;
@@ -31,6 +39,7 @@ mergeInto(LibraryManager.library, {
         term.write(str);
     },
 
+    console_get_size__sig: 'vpp',
     console_get_size: function(pw, ph)
     {
         var w, h, r;
@@ -41,7 +50,7 @@ mergeInto(LibraryManager.library, {
 
     fs_export_file: function(filename, buf, buf_len)
     {
-        var _filename = Pointer_stringify(filename);
+        var _filename = UTF8ToString(filename);
 //        console.log("exporting " + _filename);
         var data = HEAPU8.subarray(buf, buf + buf_len);
         var file = new Blob([data], { type: "application/octet-stream" });
@@ -58,20 +67,21 @@ mergeInto(LibraryManager.library, {
         }, 50);
     },
 
+    emscripten_async_wget3_data__deps: ['malloc', 'free'],
     emscripten_async_wget3_data: function(url, request, user, password, post_data, post_data_len, arg, free, onload, onerror, onprogress) {
-    var _url = Pointer_stringify(url);
-    var _request = Pointer_stringify(request);
+    var _url = UTF8ToString(url);
+    var _request = UTF8ToString(request);
     var _user;
     var _password;
 
       var http = new XMLHttpRequest();
 
       if (user)
-          _user = Pointer_stringify(user);
+          _user = UTF8ToString(user);
       else
           _user = null;
       if (password)
-          _password = Pointer_stringify(password);
+          _password = UTF8ToString(password);
       else
           _password = null;
         
@@ -80,8 +90,22 @@ mergeInto(LibraryManager.library, {
       if (_user) {
           http.setRequestHeader("Authorization", "Basic " + btoa(_user + ':' + _password));
       }
+
+        if(!window.wget) {
+            window.wget = {
+              wgetRequests: {},
+              nextWgetRequestHandle: 0,
+
+              getNextWgetRequestHandle() {
+                var handle = wget.nextWgetRequestHandle;
+                wget.nextWgetRequestHandle++;
+                return handle;
+              },
+            }
+        }
+
         
-    var handle = Browser.getNextWgetRequestHandle();
+    var handle = wget.getNextWgetRequestHandle();
 
     // LOAD
     http.onload = function http_onload(e) {
@@ -89,30 +113,31 @@ mergeInto(LibraryManager.library, {
         var byteArray = new Uint8Array(http.response);
         var buffer = _malloc(byteArray.length);
         HEAPU8.set(byteArray, buffer);
-        if (onload) Runtime.dynCall('viiii', onload, [handle, arg, buffer, byteArray.length]);
+      console.log(handle);
+        if (onload) {{{ makeDynCall('viiii', 'onload') }}}(handle, arg, buffer, byteArray.length);
         if (free) _free(buffer);
       } else {
-        if (onerror) Runtime.dynCall('viiii', onerror, [handle, arg, http.status, http.statusText]);
+        if (onerror) {{{ makeDynCall('viiii', 'onerror') }}}(handle, arg, http.status, http.statusText);
       }
-      delete Browser.wgetRequests[handle];
+      delete wget.wgetRequests[handle];
     };
 
     // ERROR
     http.onerror = function http_onerror(e) {
       if (onerror) {
-        Runtime.dynCall('viiii', onerror, [handle, arg, http.status, http.statusText]);
+          {{{ makeDynCall('viiii', 'onerror') }}}(handle, arg, http.status, http.statusText);
       }
-      delete Browser.wgetRequests[handle];
+      delete wget.wgetRequests[handle];
     };
 
     // PROGRESS
     http.onprogress = function http_onprogress(e) {
-      if (onprogress) Runtime.dynCall('viiii', onprogress, [handle, arg, e.loaded, e.lengthComputable || e.lengthComputable === undefined ? e.total : 0]);
+      if (onprogress) {{{ makeDynCall('viiii', 'onprogress') }}}(handle, arg, e.loaded, e.lengthComputable || e.lengthComputable === undefined ? e.total : 0);
     };
 
     // ABORT
     http.onabort = function http_onabort(e) {
-      delete Browser.wgetRequests[handle];
+      delete wget.wgetRequests[handle];
     };
 
     // Useful because the browser can limit the number of redirection
@@ -132,7 +157,7 @@ mergeInto(LibraryManager.library, {
       http.send(null);
     }
 
-    Browser.wgetRequests[handle] = http;
+    wget.wgetRequests[handle] = http;
 
     return handle;
   },
@@ -142,6 +167,7 @@ mergeInto(LibraryManager.library, {
       update_downloading(Boolean(flag));
   },
     
+  fb_refresh__sig: 'vppiiiii',
   fb_refresh: function(opaque, data, x, y, w, h, stride)
   {
       var i, j, v, src, image_data, dst_pos, display, dst_pos1, image_stride;
@@ -170,6 +196,7 @@ mergeInto(LibraryManager.library, {
       display.ctx.putImageData(display.image, 0, 0, x, y, w, h);
   },
 
+  net_recv_packet__sig: 'vppi',
   net_recv_packet: function(bs, buf, buf_len)
   {
       if (net_state) {
@@ -276,5 +303,30 @@ mergeInto(LibraryManager.library, {
           }
       }
   },
-   
+
+  handle_serial_message__sig: 'vppi',
+  handle_serial_message(opauqe, buf, len) 
+  {
+      const str = String.fromCharCode.apply(String, HEAPU8.subarray(buf, buf + len));
+      if (!window.serial_buf) {
+          window.serial_buf = "";
+      }
+      window.serial_buf += str;
+      while (window.serial_buf.length != 0) {
+          let newlinePos = window.serial_buf.search('\n');
+          if (newlinePos != -1) {
+              const msg = window.serial_buf.substring(0, newlinePos);
+              window.serial_buf = window.serial_buf.substring(newlinePos+1);
+              try {
+                  handle_parsed_serial_message(JSON.parse(msg));
+              } catch (e) {
+                  console.error("message parsing error", msg, e);
+              }
+          } else {
+              break;
+          }
+      }
+  },
 });
+mergeInto(LibraryManager.library, LibraryBrowser);
+mergeInto(LibraryManager.library, LibraryWget);

@@ -44,7 +44,7 @@
 typedef struct RISCVCPUState RISCVCPUState;
 
 typedef struct {
-    RISCVCPUState *(*riscv_cpu_init)(PhysMemoryMap *mem_map);
+    RISCVCPUState *(*riscv_cpu_init)(PhysMemoryMap *mem_map, uint64_t rtc_start_time);
     void (*riscv_cpu_end)(RISCVCPUState *s);
     void (*riscv_cpu_interp)(RISCVCPUState *s, int n_cycles);
     uint64_t (*riscv_cpu_get_cycles)(RISCVCPUState *s);
@@ -67,7 +67,7 @@ extern const RISCVCPUClass riscv_cpu_class32;
 extern const RISCVCPUClass riscv_cpu_class64;
 extern const RISCVCPUClass riscv_cpu_class128;
 
-RISCVCPUState *riscv_cpu_init(PhysMemoryMap *mem_map, int max_xlen);
+RISCVCPUState *riscv_cpu_init(PhysMemoryMap *mem_map, int max_xlen, uint64_t rtc_start_time);
 static inline void riscv_cpu_end(RISCVCPUState *s)
 {
     const RISCVCPUClass *c = ((RISCVCPUCommonState *)s)->class_ptr;

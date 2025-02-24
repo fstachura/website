@@ -92,6 +92,7 @@ typedef struct {
     char *display_device; /* NULL means no display */
     int width, height; /* graphic width & height */
     CharacterDevice *console;
+    CharacterDevice *extra_serial;
     VMDriveEntry tab_drive[MAX_DRIVE_DEVICE];
     int drive_count;
     VMFSEntry tab_fs[MAX_FS_DEVICE];
@@ -114,6 +115,9 @@ typedef struct VirtMachine {
     /* console */
     VIRTIODevice *console_dev;
     CharacterDevice *console;
+    /* extra serial */
+    VIRTIODevice *extra_serial_dev;
+    CharacterDevice *extra_serial;
     /* graphics */
     FBDevice *fb_dev;
 } VirtMachine;

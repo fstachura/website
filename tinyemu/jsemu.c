@@ -49,12 +49,18 @@ extern void fb_refresh(void *opaque, void *data,
                        int x, int y, int w, int h, int stride);
 extern void net_recv_packet(EthernetDevice *bs,
                             const uint8_t *buf, int len);
+extern void handle_serial_message(void *opaque, uint8_t *buf, int len);
 
 static uint8_t console_fifo[1024];
 static int console_fifo_windex;
 static int console_fifo_rindex;
 static int console_fifo_count;
 static BOOL console_resize_pending;
+
+//static uint8_t extra_serial_fifo[1024];
+//static int extra_serial_fifo_windex;
+//static int extra_serial_fifo_rindex;
+//static int extra_serial_fifo_count;
 
 static int global_width;
 static int global_height;
@@ -80,7 +86,7 @@ static int console_read(void *opaque, uint8_t *buf, int len)
 }
 
 /* called from JS */
-void console_queue_char(int c)
+void EMSCRIPTEN_KEEPALIVE console_queue_char(int c)
 {
     if (console_fifo_count < sizeof(console_fifo)) {
         console_fifo[console_fifo_windex] = c;
@@ -91,7 +97,7 @@ void console_queue_char(int c)
 }
 
 /* called from JS */
-void display_key_event(int is_down, int key_code)
+void EMSCRIPTEN_KEEPALIVE display_key_event(int is_down, int key_code)
 {
     if (global_vm) {
         vm_send_key_event(global_vm, is_down, key_code);
@@ -101,7 +107,7 @@ void display_key_event(int is_down, int key_code)
 /* called from JS */
 static int mouse_last_x, mouse_last_y, mouse_last_buttons;
 
-void display_mouse_event(int dx, int dy, int buttons)
+void EMSCRIPTEN_KEEPALIVE display_mouse_event(int dx, int dy, int buttons)
 {
     if (global_vm) {
         if (vm_mouse_is_absolute(global_vm) || 1) {
@@ -122,7 +128,7 @@ void display_mouse_event(int dx, int dy, int buttons)
 }
 
 /* called from JS */
-void display_wheel_event(int dz)
+void EMSCRIPTEN_KEEPALIVE display_wheel_event(int dz)
 {
     if (global_vm) {
         vm_send_mouse_event(global_vm, mouse_last_x, mouse_last_y, dz,
@@ -131,7 +137,7 @@ void display_wheel_event(int dz)
 }
 
 /* called from JS */
-void net_write_packet(const uint8_t *buf, int buf_len)
+void EMSCRIPTEN_KEEPALIVE net_write_packet(const uint8_t *buf, int buf_len)
 {
     EthernetDevice *net = global_vm->net;
     if (net) {
@@ -140,7 +146,7 @@ void net_write_packet(const uint8_t *buf, int buf_len)
 }
 
 /* called from JS */
-void net_set_carrier(BOOL carrier_state)
+void EMSCRIPTEN_KEEPALIVE net_set_carrier(BOOL carrier_state)
 {
     EthernetDevice *net;
     global_carrier_state = carrier_state;
@@ -168,6 +174,24 @@ static CharacterDevice *console_init(void)
     return dev;
 }
 
+static int extra_serial_read(void *opaque, uint8_t *buf, int len) {
+    return 0;
+}
+
+static void extra_serial_write(void *opaque, const uint8_t *buf, int len) {
+    handle_serial_message(opaque, buf, len);
+}
+
+static CharacterDevice *extra_serial_init(void)
+{
+    CharacterDevice *dev;
+    printf("extra serial registered\n");
+    dev = mallocz(sizeof(*dev));
+    dev->write_data = extra_serial_write;
+    dev->read_data = extra_serial_read;
+    return dev;
+}
+
 typedef struct {
     VirtMachineParams *p;
     int ram_size;
@@ -180,10 +204,11 @@ static void init_vm(void *arg);
 static void init_vm_fs(void *arg);
 static void init_vm_drive(void *arg);
 
-void vm_start(const char *url, int ram_size, const char *cmdline,
+void EMSCRIPTEN_KEEPALIVE vm_start(const char *url, int ram_size, const char *cmdline,
               const char *pwd, int width, int height, BOOL has_network)
 {
     VMStartState *s;
+
 
     s = mallocz(sizeof(*s));
     s->ram_size = ram_size;
@@ -253,6 +278,8 @@ static void init_vm(void *arg)
     } else {
         p->console = console_init();
     }
+
+    p->extra_serial = extra_serial_init();
     
     if (p->eth_count > 0 && !s->has_network) {
         /* remove the interfaces */

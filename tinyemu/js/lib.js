@@ -113,7 +113,6 @@ mergeInto(LibraryManager.library, {
         var byteArray = new Uint8Array(http.response);
         var buffer = _malloc(byteArray.length);
         HEAPU8.set(byteArray, buffer);
-      console.log(handle);
         if (onload) {{{ makeDynCall('viiii', 'onload') }}}(handle, arg, buffer, byteArray.length);
         if (free) _free(buffer);
       } else {
@@ -317,6 +316,9 @@ mergeInto(LibraryManager.library, {
           if (newlinePos != -1) {
               const msg = window.serial_buf.substring(0, newlinePos);
               window.serial_buf = window.serial_buf.substring(newlinePos+1);
+              if (msg.length == 0) {
+                  continue
+              }
               try {
                   handle_parsed_serial_message(JSON.parse(msg));
               } catch (e) {

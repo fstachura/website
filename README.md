@@ -1,4 +1,4 @@
-TinyEMU with patches to work with (patched) Linux 6.10.11.
+TinyEMU with patches to work with (patched) Linux 6.10.11 and Buildroot 2024.02.06
 
 TinyEMU code by Fabrice Bellard taken from https://bellard.org/tinyemu/
 
@@ -12,7 +12,7 @@ Some changes might have been also taken from the following repositories:
 * kernel hang during boot - see notes/linux-bisect-unaligned-access, unaligned_access.patch, check_unaligned_access_all_cpus is either too slow, or causes a hang
 * kernel hang after boot - see tinyemu/riscv_machine.c:649, notes/linux-bisect-mm-hang, linux probably started overwriting firmware, fixed by adding more memory to reserved-memory in dtb
 * system hang after boot - some applications were waiting for higher entropy, fixed after adding haveged to system from buildroot
-* sleep hangs, time does not progress - fixed by implementing rdtime csr read in emulator. probably should've been handled by bbl/pk, but for some reason isn't
+* sleep hangs, time does not progress - fixed by implementing rdtime csr read in emulator. probably should've been handled by bbl/pk, but for some reason isn't. clock is still too slow, but at least it progresses
 * emscripten issues - `-O0` adds asserts, js functions called from c needed `__sig` entries
 
 # setup notes (WIP)
@@ -32,8 +32,20 @@ riscv64-buildroot-linux-gnu-objcopy -O binary bbl bbl.bin
 
 ## buildroot
 
+```
+. ./output/host/environment-setup
+make -j8
+riscv64-buildroot-linux-gnu-objcopy ./output/images/vmlinux  -O binary ./kernel-riscv64.bin
+
 e2fsck -f ./buildroot/output/images/rootfs.ext2
 resize2fs -M ./buildroot/output/images/rootfs.ext2
+```
+
+## tinyemu
+
+``
+./splitimg ../../buildroot-2024.02.6/output/images/rootfs.ext2 ./root-riscv64
+``
 
 ## x11
 

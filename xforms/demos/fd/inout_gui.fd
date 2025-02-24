@@ -1,0 +1,381 @@
+Magic: 15000
+
+Internal Form Definition File
+    (do not change)
+
+Number of forms: 1
+Unit of measure: FL_COORD_PIXEL
+SnapGrid: 5
+Use-X11-Fonts: 0
+
+=============== FORM ===============
+Name: f
+Width: 737
+Height: 693
+Number of Objects: 20
+
+--------------------
+class: FL_BOX
+type: FL_FLAT_BOX
+box: 0 0 737 693
+boxtype: FL_FLAT_BOX
+colors: FL_COL1 FL_COL1
+alignment: FL_ALIGN_CENTER
+style: FL_NORMAL_STYLE
+size: FL_DEFAULT_SIZE
+lcol: FL_BLACK
+label: 
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: 
+callback: 
+argument: 
+
+--------------------
+class: FL_LABELFRAME
+type: FL_ENGRAVED_FRAME
+box: 180 405 320 100
+boxtype: FL_NO_BOX
+colors: FL_BLACK FL_COL1
+alignment: FL_ALIGN_LEFT_TOP
+style: FL_NORMAL_STYLE
+size: FL_DEFAULT_SIZE
+lcol: FL_BLACK
+label: PLC managing the process and holding the values
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: 
+callback: 
+argument: 
+
+--------------------
+class: FL_TEXT
+type: FL_NORMAL_TEXT
+box: 200 425 100 30
+boxtype: FL_FLAT_BOX
+colors: FL_COL1 FL_MCOL
+alignment: FL_ALIGN_LEFT|FL_ALIGN_INSIDE
+style: FL_NORMAL_STYLE
+size: FL_DEFAULT_SIZE
+lcol: FL_BLACK
+label: process value 1
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: 
+callback: 
+argument: 
+
+--------------------
+class: FL_TEXT
+type: FL_NORMAL_TEXT
+box: 330 425 150 30
+boxtype: FL_DOWN_BOX
+colors: FL_MCOL FL_MCOL
+alignment: FL_ALIGN_CENTER
+style: FL_NORMAL_STYLE
+size: 16
+lcol: FL_BLACK
+label: 0
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: plc_pv1
+callback: 
+argument: 
+
+--------------------
+class: FL_TEXT
+type: FL_NORMAL_TEXT
+box: 200 465 100 30
+boxtype: FL_FLAT_BOX
+colors: FL_COL1 FL_MCOL
+alignment: FL_ALIGN_LEFT|FL_ALIGN_INSIDE
+style: FL_NORMAL_STYLE
+size: FL_DEFAULT_SIZE
+lcol: FL_BLACK
+label: process value 2
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: 
+callback: 
+argument: 
+
+--------------------
+class: FL_TEXT
+type: FL_NORMAL_TEXT
+box: 330 460 150 30
+boxtype: FL_DOWN_BOX
+colors: FL_MCOL FL_MCOL
+alignment: FL_ALIGN_CENTER
+style: FL_NORMAL_STYLE
+size: 16
+lcol: FL_BLACK
+label: 0
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: plc_pv2
+callback: 
+argument: 
+
+--------------------
+class: FL_LABELFRAME
+type: FL_ENGRAVED_FRAME
+box: 75 265 220 95
+boxtype: FL_NO_BOX
+colors: FL_BLACK FL_COL1
+alignment: FL_ALIGN_LEFT_TOP
+style: FL_NORMAL_STYLE
+size: FL_DEFAULT_SIZE
+lcol: FL_BLACK
+label: terminal 1 (never stops)
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: 
+callback: 
+argument: 
+
+--------------------
+class: FL_INPUT
+type: FL_INT_INPUT
+box: 190 275 90 35
+boxtype: FL_DOWN_BOX
+colors: FL_YELLOW FL_WHEAT
+alignment: FL_ALIGN_LEFT
+style: FL_NORMAL_STYLE
+size: FL_DEFAULT_SIZE
+lcol: FL_BLACK
+label: process value 1
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: term1_pv1
+callback: cb_write_to_plc
+argument: 1
+
+--------------------
+class: FL_INPUT
+type: FL_INT_INPUT
+box: 190 315 90 35
+boxtype: FL_DOWN_BOX
+colors: FL_YELLOW FL_WHEAT
+alignment: FL_ALIGN_LEFT
+style: FL_NORMAL_STYLE
+size: FL_DEFAULT_SIZE
+lcol: FL_BLACK
+label: process value 2
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: term1_pv2
+callback: cb_write_to_plc
+argument: 2
+
+--------------------
+class: FL_LABELFRAME
+type: FL_ENGRAVED_FRAME
+box: 375 265 220 95
+boxtype: FL_NO_BOX
+colors: FL_BLACK FL_COL1
+alignment: FL_ALIGN_LEFT_TOP
+style: FL_NORMAL_STYLE
+size: FL_DEFAULT_SIZE
+lcol: FL_BLACK
+label: terminal 2 (stops with work around)
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: 
+callback: 
+argument: 
+
+--------------------
+class: FL_INPUT
+type: FL_INT_INPUT
+box: 490 275 90 35
+boxtype: FL_DOWN_BOX
+colors: FL_YELLOW FL_WHEAT
+alignment: FL_ALIGN_LEFT
+style: FL_NORMAL_STYLE
+size: FL_DEFAULT_SIZE
+lcol: FL_BLACK
+label: process value 1
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: term2_pv1
+callback: cb_write_to_plc
+argument: 1
+
+--------------------
+class: FL_INPUT
+type: FL_INT_INPUT
+box: 490 315 90 35
+boxtype: FL_DOWN_BOX
+colors: FL_YELLOW FL_WHEAT
+alignment: FL_ALIGN_LEFT
+style: FL_NORMAL_STYLE
+size: FL_DEFAULT_SIZE
+lcol: FL_BLACK
+label: process value 2
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: term2_pv2
+callback: cb_write_to_plc
+argument: 2
+
+--------------------
+class: FL_LABELFRAME
+type: FL_ENGRAVED_FRAME
+box: 145 525 415 100
+boxtype: FL_NO_BOX
+colors: FL_BLACK FL_COL1
+alignment: FL_ALIGN_LEFT_TOP
+style: FL_NORMAL_STYLE
+size: FL_DEFAULT_SIZE
+lcol: FL_BLACK
+label: terminal 3 using InOut
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: 
+callback: 
+argument: 
+
+--------------------
+class: FL_INPUT
+type: FL_INT_INPUT
+box: 257 520 88 35
+boxtype: FL_DOWN_BOX
+colors: FL_YELLOW FL_WHEAT
+alignment: FL_ALIGN_LEFT
+style: FL_NORMAL_STYLE
+size: FL_DEFAULT_SIZE
+lcol: FL_BLACK
+label: process value 1
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: term3_pv1
+callback: cb_write_to_plc
+argument: 1
+
+--------------------
+class: FL_INPUT
+type: FL_INT_INPUT
+box: 257 580 88 35
+boxtype: FL_DOWN_BOX
+colors: FL_YELLOW FL_WHEAT
+alignment: FL_ALIGN_LEFT
+style: FL_NORMAL_STYLE
+size: FL_DEFAULT_SIZE
+lcol: FL_BLACK
+label: process value 2
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: term3_pv2
+callback: cb_write_to_plc
+argument: 2
+
+--------------------
+class: FL_BUTTON
+type: FL_NORMAL_BUTTON
+box: 645 620 80 40
+boxtype: FL_UP_BOX
+colors: FL_COL1 FL_COL1
+alignment: FL_ALIGN_CENTER
+style: FL_NORMAL_STYLE
+size: FL_DEFAULT_SIZE
+lcol: FL_BLACK
+label: End
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: 
+callback: 
+argument: 
+
+--------------------
+class: FL_CHOICE
+type: FL_NORMAL_CHOICE2
+box: 415 565 105 25
+boxtype: FL_UP_BOX
+colors: FL_COL1 FL_BLACK
+alignment: FL_ALIGN_TOP
+style: FL_NORMAL_STYLE
+size: FL_DEFAULT_SIZE
+lcol: FL_BLACK
+label: InOut mode
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: term3_onoff
+callback: cb_term3_onoff
+argument: 0
+    content: ON
+    content: OFF
+    value: 1
+
+--------------------
+class: FL_TEXT
+type: FL_NORMAL_TEXT
+box: 75 370 550 20
+boxtype: FL_FLAT_BOX
+colors: FL_COL1 FL_MCOL
+alignment: FL_ALIGN_LEFT|FL_ALIGN_INSIDE
+style: FL_NORMAL_STYLE
+size: FL_DEFAULT_SIZE
+lcol: FL_BLACK
+label: change of values of one central and active controller from multiple terminals
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: 
+callback: 
+argument: 
+
+--------------------
+class: FL_TEXT
+type: FL_NORMAL_TEXT
+box: 30 10 555 35
+boxtype: FL_FLAT_BOX
+colors: FL_COL1 FL_MCOL
+alignment: FL_ALIGN_LEFT|FL_ALIGN_INSIDE
+style: FL_NORMAL_STYLE
+size: FL_LARGE_SIZE
+lcol: FL_BLACK
+label: This program demonstrates why inout-mode is necessary.
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: 
+callback: 
+argument: 
+
+--------------------
+class: FL_TEXT
+type: FL_NORMAL_TEXT
+box: 20 45 695 185
+boxtype: FL_FLAT_BOX
+colors: FL_COL1 FL_MCOL
+alignment: FL_ALIGN_LEFT|FL_ALIGN_INSIDE
+style: FL_NORMAL_STYLE
+size: FL_NORMAL_SIZE
+lcol: FL_BLACK
+label: All yellow fields are cyclically updated by an idle task, getting the values from the PLC.\nEdit the fields of 'terminal 1' is not possible since they are always overwritten by the idle task.\n\n'terminal 2': If you try to block the update by using 'obj->belowmouse' it will not been updated if the cursor\naccidently is over the field. Move your mouse over the field to verify this.\n\n'terminal 3' demonstrates 'inout-mode'.
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: 
+callback: 
+argument: 
+
+==============================
+create_the_forms

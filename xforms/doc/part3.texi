@@ -1,0 +1,26 @@
+@node Part III
+@unnumbered @emph{Part III - Object Classes}
+
+@menu
+* Part III Introduction::
+* Part III Static Objects::
+* Part III Button-like Objects::
+* Part III Valuator Objects::
+* Part III Input Objects::
+* Part III Choice Objects::
+* Part III Container Objects::
+* Part III Other Objects::
+* Part III Popups::
+* Part III Deprecated Objects::
+@end menu
+
+@include part3_introduction.texi
+@include part3_static_objects.texi
+@include part3_buttons.texi
+@include part3_valuator_objects.texi
+@include part3_input_objects.texi
+@include part3_choice_objects.texi
+@include part3_container_objects.texi
+@include part3_other_objects.texi
+@include part3_popups.texi
+@include part3_deprecated_objects.texi

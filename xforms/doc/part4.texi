@@ -1,0 +1,22 @@
+@node Part IV
+@unnumbered @emph{Part IV - Designing Object Classes}
+
+@menu
+* Part IV Introduction::
+* Part IV Global Structure::
+* Part IV Events::
+* Part IV The Type FL_OBJECT::
+* Part IV Drawing Objects::
+* Part IV An Example::
+* Part IV New Buttons::
+* Part IV Using a Pre-emptive Handler::
+@end menu
+
+@include part4_introduction.texi
+@include part4_global_structure.texi
+@include part4_events.texi
+@include part4_fl_object.texi
+@include part4_drawing_objects.texi
+@include part4_an_example.texi
+@include part4_new_buttons.texi
+@include part4_preemptive_handler.texi

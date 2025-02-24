@@ -1,0 +1,16 @@
+@node Part V
+@unnumbered @emph{Part V - General Informations}
+
+@menu
+* Part V Overview of Main Functions::
+* Part V Some Useful Functions::
+* Part V Resources for Forms Library::
+* Part V Dirty Tricks::
+* Part V Trouble Shooting::
+@end menu
+
+@include part5_overview.texi
+@include part5_useful_functions.texi
+@include part5_resources.texi
+@include part5_dirty_tricks.texi
+@include part5_trouble_shooting.texi

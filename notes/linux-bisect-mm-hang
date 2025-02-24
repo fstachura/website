@@ -1,0 +1,40 @@
+git bisect start
+# status: waiting for both good and bad commits
+# bad: [06c2afb862f9da8dc5efa4b6076a0e48c3fbaaa5] Linux 6.5-rc1
+git bisect bad 06c2afb862f9da8dc5efa4b6076a0e48c3fbaaa5
+# status: waiting for good commit(s), bad commit known
+# good: [4fe89d07dcc2804c8b562f6c7896a45643d34b2f] Linux 6.0
+git bisect good 4fe89d07dcc2804c8b562f6c7896a45643d34b2f
+# good: [6c71297eaf713ece684a367ce9aff06069d715b9] Merge tag 'for-linus-2023022201' of git://git.kernel.org/pub/scm/linux/kernel/git/hid/hid
+git bisect good 6c71297eaf713ece684a367ce9aff06069d715b9
+# good: [97b2ff294381d05e59294a931c4db55276470cb5] Merge tag 'staging-6.4-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/staging
+git bisect good 97b2ff294381d05e59294a931c4db55276470cb5
+# bad: [6a8cbd9253abc1bd0df4d60c4c24fa555190376d] Merge tag 'v6.5-rc1-sysctl-next' of git://git.kernel.org/pub/scm/linux/kernel/git/mcgrof/linux
+git bisect bad 6a8cbd9253abc1bd0df4d60c4c24fa555190376d
+# bad: [adfbf653a3ba6bb8bbb84ed90bf4f1533db545d3] Merge tag 'fbdev-for-6.4-rc2' of git://git.kernel.org/pub/scm/linux/kernel/git/deller/linux-fbdev
+git bisect bad adfbf653a3ba6bb8bbb84ed90bf4f1533db545d3
+# bad: [d55571c0084465f1f7e1e29f22bd910d366a6e1d] Merge tag 'kbuild-v6.4' of git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild
+git bisect bad d55571c0084465f1f7e1e29f22bd910d366a6e1d
+# good: [22b8cc3e78f5448b4c5df00303817a9137cd663f] Merge tag 'x86_mm_for_6.4' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip
+git bisect good 22b8cc3e78f5448b4c5df00303817a9137cd663f
+# bad: [1e098dec61ba342c8cebbfdf0fcdcd9ce54f7fa1] Merge tag 'ntfs3_for_6.4' of https://github.com/Paragon-Software-Group/linux-ntfs3
+git bisect bad 1e098dec61ba342c8cebbfdf0fcdcd9ce54f7fa1
+# good: [70cc1b5307e8ee3076fdf2ecbeb89eb973aa0ff7] Merge tag 'powerpc-6.4-1' of git://git.kernel.org/pub/scm/linux/kernel/git/powerpc/linux
+git bisect good 70cc1b5307e8ee3076fdf2ecbeb89eb973aa0ff7
+# good: [9419092fb2630c30e4ffeb9ef61007ef0c61827a] xfs: fix livelock in delayed allocation at ENOSPC
+git bisect good 9419092fb2630c30e4ffeb9ef61007ef0c61827a
+# bad: [cd546fa325161fbe374480a5081b6ebb7d1bec95] Merge tag 'wq-for-6.4' of git://git.kernel.org/pub/scm/linux/kernel/git/tj/wq
+git bisect bad cd546fa325161fbe374480a5081b6ebb7d1bec95
+# good: [eb04e72b345b01d192163e012853fb28f433b234] Merge patch series "RISC-V Hardware Probing User Interface"
+git bisect good eb04e72b345b01d192163e012853fb28f433b234
+# bad: [310c33dc7a1278d80ba717b9964bd478d52681e0] Merge patch series "Introduce 64b relocatable kernel"
+git bisect bad 310c33dc7a1278d80ba717b9964bd478d52681e0
+# bad: [2e75ab3189ecfe5f4383ef82896d30eaad0b3cd6] Merge patch series "riscv: Use PUD/P4D/PGD pages for the linear mapping"
+git bisect bad 2e75ab3189ecfe5f4383ef82896d30eaad0b3cd6
+# good: [5464912cfae706aff47f6253c495bf81284bc5d5] RISC-V: align ISA extension Kconfig help text with each other
+git bisect good 5464912cfae706aff47f6253c495bf81284bc5d5
+# good: [8589e346bbb679cf7a4b564f75295d94250058f0] riscv: Move the linear mapping creation in its own function
+git bisect good 8589e346bbb679cf7a4b564f75295d94250058f0
+# bad: [3335068f87217ea59d08f462187dc856652eea15] riscv: Use PUD/P4D/PGD pages for the linear mapping
+git bisect bad 3335068f87217ea59d08f462187dc856652eea15
+# first bad commit: [3335068f87217ea59d08f462187dc856652eea15] riscv: Use PUD/P4D/PGD pages for the linear mapping

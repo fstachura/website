@@ -1,0 +1,37 @@
+git bisect start
+# status: waiting for both good and bad commits
+# bad: [ffc253263a1375a65fa6c9f62a893e9767fbebfa] Linux 6.6
+git bisect bad ffc253263a1375a65fa6c9f62a893e9767fbebfa
+# good: [4631960b4700dd53f5cebb4f7055fd00ccd556ce] Linux 6.5.13
+git bisect good 4631960b4700dd53f5cebb4f7055fd00ccd556ce
+# good: [2dde18cd1d8fac735875f2e4987f11817cc0bc2c] Linux 6.5
+git bisect good 2dde18cd1d8fac735875f2e4987f11817cc0bc2c
+# good: [a1c19328a160c80251868dbd80066dce23d07995] Merge tag 'soc-arm-6.6' of git://git.kernel.org/pub/scm/linux/kernel/git/soc/soc
+git bisect good a1c19328a160c80251868dbd80066dce23d07995
+# good: [e4f1b8202fb59c56a3de7642d50326923670513f] Merge tag 'for_linus' of git://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost
+git bisect good e4f1b8202fb59c56a3de7642d50326923670513f
+# bad: [9608c7b729e29c177525006711966ae0fd399b11] Merge tag 'drm-fixes-2023-09-15' of git://anongit.freedesktop.org/drm/drm
+git bisect bad 9608c7b729e29c177525006711966ae0fd399b11
+# good: [0c02183427b4d2002992f26d4917c1263c5d4a7f] Merge tag 'for-linus' of git://git.kernel.org/pub/scm/virt/kvm/kvm
+git bisect good 0c02183427b4d2002992f26d4917c1263c5d4a7f
+# good: [2a5a4326e58339a26cd1510259e7310b8c0980ff] Merge tag 'scsi-misc' of git://git.kernel.org/pub/scm/linux/kernel/git/jejb/scsi
+git bisect good 2a5a4326e58339a26cd1510259e7310b8c0980ff
+# good: [45fc4628c15ab2cb7b2f53354b21db63f0a41f81] perf parse-events: Fix driver config term
+git bisect good 45fc4628c15ab2cb7b2f53354b21db63f0a41f81
+# bad: [99214f67784b11e98fb099201461aebe08dec3eb] Merge tag 'trace-v6.6-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/trace/linux-trace
+git bisect bad 99214f67784b11e98fb099201461aebe08dec3eb
+# bad: [e56b2b6057996c5f48da518c79d6590f8bfaabf3] Merge tag 'x86-urgent-2023-09-10' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip
+git bisect bad e56b2b6057996c5f48da518c79d6590f8bfaabf3
+# bad: [77eea559bae925e3cd3c5193efcd37675ec227df] Merge patch series "bpf, riscv: use BPF prog pack allocator in BPF JIT"
+git bisect bad 77eea559bae925e3cd3c5193efcd37675ec227df
+# bad: [c23be918c5d0f860971cf824de772714b4c771ea] Merge patch series "Add non-coherent DMA support for AX45MP"
+git bisect bad c23be918c5d0f860971cf824de772714b4c771ea
+# bad: [7f215d003f31d56b458c7c3c8c7185a1697f5076] Merge patch series "riscv: dma-mapping: unify support for cache flushes"
+git bisect bad 7f215d003f31d56b458c7c3c8c7185a1697f5076
+# good: [935730160738a478dbf4b61cf0cfc29c1442fb4e] riscv: dma-mapping: switch over to generic implementation
+git bisect good 935730160738a478dbf4b61cf0cfc29c1442fb4e
+# bad: [f2d14bc4e437b8ed21e6890ae047a6ec47c030d9] RISC-V: alternative: Remove feature_probe_func
+git bisect bad f2d14bc4e437b8ed21e6890ae047a6ec47c030d9
+# bad: [584ea6564bcaead223840cdafe84e4947ba85509] RISC-V: Probe for unaligned access speed
+git bisect bad 584ea6564bcaead223840cdafe84e4947ba85509
+# first bad commit: [584ea6564bcaead223840cdafe84e4947ba85509] RISC-V: Probe for unaligned access speed

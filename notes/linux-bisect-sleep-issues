@@ -1,0 +1,40 @@
+git bisect start
+# status: waiting for both good and bad commits
+# good: [d5226fa6dbae0569ee43ecfc08bdcd6770fc4755] Linux 5.5
+git bisect good d5226fa6dbae0569ee43ecfc08bdcd6770fc4755
+# status: waiting for bad commit, 1 good commit known
+# bad: [f40ddce88593482919761f74910f42f4b84c004b] Linux 5.11
+git bisect bad f40ddce88593482919761f74910f42f4b84c004b
+# bad: [a57066b1a01977a646145f4ce8dfb4538b08368a] Merge git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net
+git bisect bad a57066b1a01977a646145f4ce8dfb4538b08368a
+# good: [9b48c8f132e0c30220ce509f72dd90da05245524] Merge tag 'arm-defconfig-5.7' of git://git.kernel.org/pub/scm/linux/kernel/git/soc/soc
+git bisect good 9b48c8f132e0c30220ce509f72dd90da05245524
+# good: [cb8e59cc87201af93dfbb6c3dccc8fcad72a09c2] Merge git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next
+git bisect good cb8e59cc87201af93dfbb6c3dccc8fcad72a09c2
+# good: [d26a42a9614083413e778832a6efbdf0038c3bff] Merge tag 'rpmsg-v5.8' of git://git.kernel.org/pub/scm/linux/kernel/git/andersson/remoteproc
+git bisect good d26a42a9614083413e778832a6efbdf0038c3bff
+# bad: [c141b30e9960e81455ad9c3658c079051eea7e2d] Merge tag 'rcu_urgent_for_5.8_rc3' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip
+git bisect bad c141b30e9960e81455ad9c3658c079051eea7e2d
+# bad: [df2fbf5bfa0e7fff8b4784507e4d68f200454318] Merge tag 'thermal-v5.8-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/thermal/linux
+git bisect bad df2fbf5bfa0e7fff8b4784507e4d68f200454318
+# good: [6f51ab9440d131ae424cce27e3170746219f5142] Merge tag 'mtd/for-5.8' of git://git.kernel.org/pub/scm/linux/kernel/git/mtd/linux
+git bisect good 6f51ab9440d131ae424cce27e3170746219f5142
+# bad: [cd16ed33c3c618930ccda7049dcea05ee707a9c0] Merge tag 'riscv-for-linus-5.8-mw1' of git://git.kernel.org/pub/scm/linux/kernel/git/riscv/linux
+git bisect bad cd16ed33c3c618930ccda7049dcea05ee707a9c0
+# good: [b29482fde649c72441d5478a4ea2c52c56d97a5e] Merge branch 'work.epoll' of git://git.kernel.org/pub/scm/linux/kernel/git/viro/vfs
+git bisect good b29482fde649c72441d5478a4ea2c52c56d97a5e
+# good: [a53956829914223ff6c53397b007421201354eb8] Merge tag 'nfs-for-5.8-1' of git://git.linux-nfs.org/projects/anna/linux-nfs
+git bisect good a53956829914223ff6c53397b007421201354eb8
+# good: [e0154bd478897b277aeb7195bf9088e9ce05bbb0] Merge tag 'sound-fix-5.8-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/tiwai/sound
+git bisect good e0154bd478897b277aeb7195bf9088e9ce05bbb0
+# good: [d3ea693439833b5ed9b932512e9a90b9381035c9] Merge tag 'm68knommu-for-v5.8' of git://git.kernel.org/pub/scm/linux/kernel/git/gerg/m68knommu
+git bisect good d3ea693439833b5ed9b932512e9a90b9381035c9
+# bad: [ad5d1122b82fbd6a816d1b9d26ee01a6dbc2d757] riscv: use vDSO common flow to reduce the latency of the time-related functions
+git bisect bad ad5d1122b82fbd6a816d1b9d26ee01a6dbc2d757
+# good: [033a65de7eced89f62d2cd166b1ee2d33af4f1e4] clocksource/drivers/timer-riscv: Use per-CPU timer interrupt
+git bisect good 033a65de7eced89f62d2cd166b1ee2d33af4f1e4
+# good: [e71ee06e3ca337758ac95288a917622ff9808fa0] RISC-V: Force select RISCV_INTC for CONFIG_RISCV
+git bisect good e71ee06e3ca337758ac95288a917622ff9808fa0
+# good: [05589dde649cd954a122b0ebb2cbe4ade8a80e98] riscv: fix build warning of missing prototypes
+git bisect good 05589dde649cd954a122b0ebb2cbe4ade8a80e98
+# first bad commit: [ad5d1122b82fbd6a816d1b9d26ee01a6dbc2d757] riscv: use vDSO common flow to reduce the latency of the time-related functions

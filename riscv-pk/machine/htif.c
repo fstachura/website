@@ -7,18 +7,11 @@
 #include "syscall.h"
 #include <string.h>
 
-extern uint64_t __htif_base;
-volatile uint64_t tohost __attribute__((section(".htif")));
-volatile uint64_t fromhost __attribute__((section(".htif")));
+volatile extern uint64_t tohost;
+volatile extern uint64_t fromhost;
 volatile int htif_console_buf;
 static spinlock_t htif_lock = SPINLOCK_INIT;
 uintptr_t htif;
-
-#define TOHOST(base_int)	(uint64_t *)(base_int + TOHOST_OFFSET)
-#define FROMHOST(base_int)	(uint64_t *)(base_int + FROMHOST_OFFSET)
-
-#define TOHOST_OFFSET		((uintptr_t)tohost - (uintptr_t)__htif_base)
-#define FROMHOST_OFFSET		((uintptr_t)fromhost - (uintptr_t)__htif_base)
 
 static void __check_fromhost()
 {
@@ -91,7 +84,7 @@ void htif_syscall(uintptr_t arg)
 
 void htif_console_putchar(uint8_t ch)
 {
-#if __riscv_xlen == 32
+#if __riscv_xlen == 32 && 0
   // HTIF devices are not supported on RV32, so proxy a write system call
   volatile uint64_t magic_mem[8];
   magic_mem[0] = SYS_write;

@@ -35,8 +35,13 @@ static uintptr_t mcall_console_putchar(uint8_t ch)
 
 void putstring(const char* s)
 {
-  while (*s)
-    mcall_console_putchar(*s++);
+    int c;
+    while (*s) {
+        c = *s++;
+        if (c == '\n')
+            mcall_console_putchar('\r');
+        mcall_console_putchar(c);
+    }
 }
 
 void vprintm(const char* s, va_list vl)

@@ -61,7 +61,7 @@ else
   march := -march=@WITH_ARCH@
 endif
 is_32bit := $(findstring 32,$(march))
-mabi := -mabi=$(if $(is_32bit),ilp32,lp64)
+mabi := -mabi=$(if $(is_32bit),ilp32d,lp64d)
 
 # Installation directories
 

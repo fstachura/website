@@ -76,6 +76,8 @@ THE SOFTWARE.
 
 riscv-pk
 
+Patches for TinyEMU compatibility by Fabrice Bellard.
+
 Copyright (c) 2013, The Regents of the University of California (Regents).
 All Rights Reserved.
 
